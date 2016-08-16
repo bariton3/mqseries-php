@@ -69,78 +69,77 @@ If you like to use different keys for any of the services, you can overwrite mas
 # Usage
 
 ```php	
-	        //Open Queue:
-            $openParams = new MqSeries\Open\Params();
-            $openParams->objectDescType = MQSERIES_MQOT_Q;
-            $openParams->objectName = config('mqseries.queue_name');
-            $openParams->objectQMName  = '';
-            $openParams->option = MQSERIES_MQOO_OUTPUT | MQSERIES_MQOO_INPUT_AS_Q_DEF | MQSERIES_MQOO_FAIL_IF_QUIESCING;
-    
-            try {
-    
-                $queueOpenResult = MqSeries::openQueueOnQM($openParams);
-    
-            } catch (MqSeries\QueueManagerConnectionFailedException $ex) {
-                die('Exception when opening queue: ' . $ex->getCode() . ' - ' . $ex->getMessage());
-            } catch (ExtensionNotLoadedException $ex) {
-                die('YOU MUST FIRST ENABLE THE mqseries PHP EXTENSION');
-            } catch (NoConnectionParametersException $ex) {
-                die('YOU DID NOT PROVIDE CONNECTX PARAMS!');
-            }
-    
-    
-            if ($queueOpenResult !== true) {
-                die(
-                    'SOMETHING WENT WRONG WHEN OPENING THE QUEUE: ' .
-                    sprintf(
-                        "CompCode:%d Reason:%d Text:%s\n",
-                        MqSeries::getLastCompletionCode(),
-                        MqSeries::getLastCompletionReasonCode(),
-                        MqSeries::getLastCompletionReason()
-                    )
-                );
-            }
-    
-            // put the message on the queue.
-            $mqPutParams = new MqSeries\Put\Params();
-            $mqPutParams->gmoOptions = MQSERIES_MQPMO_NEW_MSG_ID;
-    
-            MqSeries::putMessageToQueue($mqPutParams, 'PING');
-    
-            if (MqSeries::getLastCompletionCode() !== MQSERIES_MQCC_OK) {
-                die(printf("put CompCode:%d Reason:%d Text:%s<br>\n", MqSeries::getLastCompletionCode(), MqSeries::etLastCompletionReasonCode(), MqSeries::getLastCompletionReason()));
-            }
-            
-            
-            //Get one message from queue:
-            $mqGetParams = new Get\Params();
-            $mqGetParams->gmoOptions = MQSERIES_MQGMO_FAIL_IF_QUIESCING | MQSERIES_MQGMO_WAIT | MQSERIES_MQGMO_CONVERT;
-            $mqGetParams->gmoWaitInterval = 5000;
-            
-            try {
-                $messageContent = $client->getMessageFromQueue($mqGetParams);
-                echo $messageContent."\n";
-            }
-            catch (QueueIsEmptyException $ex) {
-                echo "The queue is empty, no big deal.";
-            
-                if (is_string($messageContent)) {
-                    echo 'message retrieved from queue: ' . $messageContent;
-                } else {
-                    die(
-                        'SOMETHING WENT WRONG WHEN RETRIEVING A MESSAGE: ' .
-                        sprintf(
-                            "CompCode:%d Reason:%d Text:%s\n",
-                            $client->getLastCompletionCode(),
-                            $client->getLastCompletionReasonCode(),
-                            $client->getLastCompletionReason()
-                        )
-                    );
-                }
-            }
-            
-            //Close & disconnect:
-            $client->close();
-            $client->disconnect();
-
+	//Open Queue:
+	$openParams = new MqSeries\Open\Params();
+	$openParams->objectDescType = MQSERIES_MQOT_Q;
+	$openParams->objectName = config('mqseries.queue_name');
+	$openParams->objectQMName  = '';
+	$openParams->option = MQSERIES_MQOO_OUTPUT | MQSERIES_MQOO_INPUT_AS_Q_DEF | MQSERIES_MQOO_FAIL_IF_QUIESCING;
+	
+	try {
+	
+	$queueOpenResult = MqSeries::openQueueOnQM($openParams);
+	
+	} catch (MqSeries\QueueManagerConnectionFailedException $ex) {
+	die('Exception when opening queue: ' . $ex->getCode() . ' - ' . $ex->getMessage());
+	} catch (ExtensionNotLoadedException $ex) {
+	die('YOU MUST FIRST ENABLE THE mqseries PHP EXTENSION');
+	} catch (NoConnectionParametersException $ex) {
+	die('YOU DID NOT PROVIDE CONNECTX PARAMS!');
+	}
+	
+	
+	if ($queueOpenResult !== true) {
+	die(
+	    'SOMETHING WENT WRONG WHEN OPENING THE QUEUE: ' .
+	    sprintf(
+	        "CompCode:%d Reason:%d Text:%s\n",
+	        MqSeries::getLastCompletionCode(),
+	        MqSeries::getLastCompletionReasonCode(),
+	        MqSeries::getLastCompletionReason()
+	    )
+	);
+	}
+	
+	// put the message on the queue.
+	$mqPutParams = new MqSeries\Put\Params();
+	$mqPutParams->gmoOptions = MQSERIES_MQPMO_NEW_MSG_ID;
+	
+	MqSeries::putMessageToQueue($mqPutParams, 'PING');
+	
+	if (MqSeries::getLastCompletionCode() !== MQSERIES_MQCC_OK) {
+	die(printf("put CompCode:%d Reason:%d Text:%s<br>\n", MqSeries::getLastCompletionCode(), MqSeries::etLastCompletionReasonCode(), MqSeries::getLastCompletionReason()));
+	}
+	
+	
+	//Get one message from queue:
+	$mqGetParams = new Get\Params();
+	$mqGetParams->gmoOptions = MQSERIES_MQGMO_FAIL_IF_QUIESCING | MQSERIES_MQGMO_WAIT | MQSERIES_MQGMO_CONVERT;
+	$mqGetParams->gmoWaitInterval = 5000;
+	
+	try {
+	$messageContent = $client->getMessageFromQueue($mqGetParams);
+	echo $messageContent."\n";
+	}
+	catch (QueueIsEmptyException $ex) {
+	echo "The queue is empty, no big deal.";
+	
+	if (is_string($messageContent)) {
+	    echo 'message retrieved from queue: ' . $messageContent;
+	} else {
+	    die(
+	        'SOMETHING WENT WRONG WHEN RETRIEVING A MESSAGE: ' .
+	        sprintf(
+	            "CompCode:%d Reason:%d Text:%s\n",
+	            $client->getLastCompletionCode(),
+	            $client->getLastCompletionReasonCode(),
+	            $client->getLastCompletionReason()
+	        )
+	    );
+	}
+	}
+	
+	//Close & disconnect:
+	$client->close();
+	$client->disconnect();
 ```
