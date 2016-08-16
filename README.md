@@ -77,15 +77,13 @@ If you like to use different keys for any of the services, you can overwrite mas
 	$openParams->option = MQSERIES_MQOO_OUTPUT | MQSERIES_MQOO_INPUT_AS_Q_DEF | MQSERIES_MQOO_FAIL_IF_QUIESCING;
 	
 	try {
-	
-	$queueOpenResult = MqSeries::openQueueOnQM($openParams);
-	
+		$queueOpenResult = MqSeries::openQueueOnQM($openParams);
 	} catch (MqSeries\QueueManagerConnectionFailedException $ex) {
-	die('Exception when opening queue: ' . $ex->getCode() . ' - ' . $ex->getMessage());
+		die('Exception when opening queue: ' . $ex->getCode() . ' - ' . $ex->getMessage());
 	} catch (ExtensionNotLoadedException $ex) {
-	die('YOU MUST FIRST ENABLE THE mqseries PHP EXTENSION');
+		die('YOU MUST FIRST ENABLE THE mqseries PHP EXTENSION');
 	} catch (NoConnectionParametersException $ex) {
-	die('YOU DID NOT PROVIDE CONNECTX PARAMS!');
+		die('YOU DID NOT PROVIDE CONNECTX PARAMS!');
 	}
 	
 	
@@ -108,38 +106,39 @@ If you like to use different keys for any of the services, you can overwrite mas
 	MqSeries::putMessageToQueue($mqPutParams, 'PING');
 	
 	if (MqSeries::getLastCompletionCode() !== MQSERIES_MQCC_OK) {
-	die(printf("put CompCode:%d Reason:%d Text:%s<br>\n", MqSeries::getLastCompletionCode(), MqSeries::etLastCompletionReasonCode(), MqSeries::getLastCompletionReason()));
+		die(printf("put CompCode:%d Reason:%d Text:%s<br>\n", MqSeries::getLastCompletionCode(), MqSeries::etLastCompletionReasonCode(), MqSeries::getLastCompletionReason()));
 	}
 	
 	
 	//Get one message from queue:
-	$mqGetParams = new Get\Params();
-	$mqGetParams->gmoOptions = MQSERIES_MQGMO_FAIL_IF_QUIESCING | MQSERIES_MQGMO_WAIT | MQSERIES_MQGMO_CONVERT;
-	$mqGetParams->gmoWaitInterval = 5000;
-	
-	try {
-	$messageContent = $client->getMessageFromQueue($mqGetParams);
-	echo $messageContent."\n";
-	}
-	catch (QueueIsEmptyException $ex) {
-	echo "The queue is empty, no big deal.";
-	
-	if (is_string($messageContent)) {
-	    echo 'message retrieved from queue: ' . $messageContent;
-	} else {
-	    die(
-	        'SOMETHING WENT WRONG WHEN RETRIEVING A MESSAGE: ' .
-	        sprintf(
-	            "CompCode:%d Reason:%d Text:%s\n",
-	            $client->getLastCompletionCode(),
-	            $client->getLastCompletionReasonCode(),
-	            $client->getLastCompletionReason()
-	        )
-	    );
-	}
-	}
-	
-	//Close & disconnect:
-	$client->close();
-	$client->disconnect();
+        $messageContent = '';
+        $mqGetParams = new MqSeries\Get\Params();
+        $mqGetParams->gmoOptions = MQSERIES_MQGMO_FAIL_IF_QUIESCING | MQSERIES_MQGMO_WAIT | MQSERIES_MQGMO_CONVERT;
+        $mqGetParams->gmoWaitInterval = 5000;
+
+        try {
+            $messageContent = MqSeries::getMessageFromQueue($mqGetParams);
+            echo $messageContent."\n";
+        }
+        catch (QueueIsEmptyException $ex) {
+            echo "The queue is empty, no big deal.";
+
+            if (is_string($messageContent)) {
+                echo 'message retrieved from queue: ' . $messageContent;
+            } else {
+                die(
+                    'SOMETHING WENT WRONG WHEN RETRIEVING A MESSAGE: ' .
+                    sprintf(
+                        "CompCode:%d Reason:%d Text:%s\n",
+                        MqSeries::getLastCompletionCode(),
+                        MqSeries::getLastCompletionReasonCode(),
+                        MqSeries::getLastCompletionReason()
+                    )
+                );
+            }
+        }
+
+        //Close & disconnect:
+        MqSeries::close();
+        MqSeries::disconnect();
 ```
