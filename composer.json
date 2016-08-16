@@ -5,10 +5,12 @@
   "minimum-stability": "stable",
   "license": "MIT license",
   "require": {
-    "php": ">=5.4.11",
+    "laravel/framework": "5.*",
+    "php": ">=5.9",
     "psr/log": "1.0.0"
   },
   "require-dev": {
+    "laravel/framework": "5.*",
     "phpunit/phpunit": "4.8.*"
   },
   "suggest": {
