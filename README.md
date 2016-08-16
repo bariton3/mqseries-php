@@ -46,7 +46,7 @@ Register package service provider and facade in 'config/app.php'
 ```
 
 
-Publish configuration file using **`php artisan vendor:publish --tag=mqseries --force`** or simply copy package configuration file and paste into **`config/googlmaps.php`**
+Publish configuration file using **`php artisan vendor:publish --tag=mqseries --force`** or simply copy package configuration file and paste into **`config/mqseries.php`**
 
 Open configuration file **`config/mqseries.php`** and add your service key
 ```php
