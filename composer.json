@@ -6,7 +6,7 @@
   "license": "MIT license",
   "require": {
     "laravel/framework": "5.*",
-    "php": ">=5.9",
+    "php": ">=5.5.9",
     "psr/log": "1.0.0"
   },
   "require-dev": {
