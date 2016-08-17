@@ -20,12 +20,12 @@
  * @license https://opensource.org/licenses/Apache-2.0 Apache 2.0
  */
 
-namespace MqSeries\Get;
+namespace MqSeries\Put;
 
 /**
- * Parameters object for the MQGET command
+ * Parameters object for the MQPUT command
  *
- * @package	MqSeries\Get
+ * @package	MqSeries\Put
  * @author  dieter <dieter.devlieghere@benelux.amadeus.com>
  */
 class Params
