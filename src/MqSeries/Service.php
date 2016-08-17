@@ -135,7 +135,7 @@ class Service implements LoggerAwareInterface
 	protected $mqExtensionLoaded;
 
 
-    /**
+        /**
 	 * Get Completion Code from last MQSeries call
 	 * 
 	 * MQSERIES_MQCC_OK			= 0
@@ -251,9 +251,9 @@ class Service implements LoggerAwareInterface
 		$this->setDefaultMessageBuffer($defaultMsgBuffer);
 	}
 
-    /**
-     * Destructor closes opened connections if needed.
-     */
+        /**
+        * Destructor closes opened connections if needed.
+        */
 	public function __destruct()
 	{
 		if ($this->isQueueOpened) {
@@ -339,10 +339,11 @@ class Service implements LoggerAwareInterface
 		
 		$this->completionCode = null;
 		$this->reason = null;
+		$mqods = $params->buildMQODS();
 		
 		mqseries_open(
 			$this->connection,
-			$params->buildMQODS(),
+			$mqods,
 			$params->option,
 			$this->objHandle,
 			$this->completionCode,
@@ -385,12 +386,13 @@ class Service implements LoggerAwareInterface
 		
 		$this->completionCode = null;
 		$this->reason = null;
+		$mqods = $params->buildMQODS();
 
 		$this->logger->debug(__METHOD__."(): ABOUT TO CALL mqseries_open().");
 
 		mqseries_open(
 			$this->connection,
-			$params->buildMQODS(),
+			$mqods,
 			$params->option,
 			$this->queue,
 			$this->completionCode,
@@ -418,11 +420,53 @@ class Service implements LoggerAwareInterface
 	}
 	
 	/**
+	* Put a message to an open queue
+	*
+	* @param Put\Params $params
+	* @param string $message
+	* @return string|boolean
+	* @throws QueueUnavailableException when there is no open queue
+	*/
+	public function putMessageToQueue($params, $message)
+	{
+	    if (!$this->isConnected || !$this->isQueueOpened) {
+	       throw new QueueUnavailableException("There is no queue to get a message from!");
+	    }
+	
+	    $mqmd = $params->buildMQMD();
+	    $mqgmo = $params->buildMQGMO();
+	
+	    mqseries_put(
+	        $this->connection,
+	        $this->queue,
+	        $mqmd,
+	        $mqgmo,
+	        $message,
+	        $this->completionCode,
+	        $this->reason
+	    );
+	
+	    if ($this->completionCode !== MQSERIES_MQCC_OK) {
+	        $this->logger->error(
+	           __METHOD__."(): ERROR " . sprintf(
+	               "PUT CompCode:%d Reason:%d Text:%s\n",
+	                $this->completionCode,
+	                $this->reason,
+	                mqseries_strerror($this->reason)
+	            )
+	        );
+	        return false;
+	    } else {
+	        return true;
+	    }
+	}	
+	
+	/**
 	 * Get a message from an open queue
 	 * 
 	 * @param Get\Params $params
 	 * @return string|boolean
-     * @throws QueueUnavailableException when there is no open queue
+         * @throws QueueUnavailableException when there is no open queue
 	 */
 	public function getMessageFromQueue($params)
 	{
