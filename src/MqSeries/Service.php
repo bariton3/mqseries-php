@@ -500,8 +500,10 @@ class Service implements LoggerAwareInterface
 			);
 
             //Check if response is "2080 MQRC TRUNCATED MSG FAILED" and if so, increase message buffer:
-            if ($this->getLastCompletionReasonCode() == 2080 &&
-                $this->getLastCompletionCode() == MQSERIES_MQCC_WARNING) {
+            if (($this->getLastCompletionReasonCode() == 2080 &&
+                $this->getLastCompletionCode() == MQSERIES_MQCC_WARNING) ||
+                ($this->getLastCompletionReasonCode() == 2190 &&
+                $this->getLastCompletionCode() == MQSERIES_MQCC_FAILED)) {
                 $this->logger->notice(
                     'Message buffer too small. Increasing to ' . $this->getLastMessageSize() .
                     ' and trying again...'
@@ -512,7 +514,10 @@ class Service implements LoggerAwareInterface
 
                 return $this->getMessageFromQueue($params);
 
-            } elseif ($this->getLastCompletionReasonCode() == 2033 &&
+            } elseif ($this->getLastCompletionReasonCode() == 2190 &&
+                $this->getLastCompletionCode() == MQSERIES_MQCC_WARNING) {
+                return $this->msg;
+	    } elseif ($this->getLastCompletionReasonCode() == 2033 &&
                 $this->getLastCompletionCode() == MQSERIES_MQCC_FAILED) {
 
                 //The queue is empty
