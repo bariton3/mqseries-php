@@ -1,5 +1,5 @@
 # mqseries-php
-client to WebSphere MQ Queue Manager using the PHP mqseries pecl extension for Laravel
+client to WebSphere MQ Queue Manager using the PHP mqseries pecl extension for Laravel. This is a fork of https://github.com/amabnl/php-mqseries
 # How
 
 - Install the WebSphere MQ Client library. 
