@@ -3,7 +3,7 @@
   "type": "library",
   "description": "client to WebSphere MQ Queue Manager using the PHP mqseries pecl extension for Laravel",
   "minimum-stability": "stable",
-  "license": "MIT license",
+  "license": "Apache License 2.0",
   "require": {
     "laravel/framework": "5.*",
     "php": ">=5.5.9",
